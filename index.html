@@ -3206,7 +3206,16 @@ svg.z1 .rm-name:not(.main){display:none}
   function castVote(vote, reason){
     if(!currentReview) return;
     var rid=currentReview.id; closeReviewModal();
-    db.from('report_reviews').insert({ report_id:rid, reviewer_id:S.user.id, vote:vote, reason:reason||null }).then(function(ins){
+    // El panel admin-reportes.html revisa la misma cola: si otra persona ya lo
+    // resolvió mientras tanto, no se vota dos veces.
+    db.from('reports').select('status').eq('id', rid).maybeSingle().then(function(st){
+      if(st && st.data && st.data.status && st.data.status!=='pendiente'){
+        S.myReviewedReports[rid]=1;
+        return renderRevisar().then(function(){ toast('Otra persona del equipo ya revisó este reporte'); }).then(function(){ return 'ya'; });
+      }
+      return db.from('report_reviews').insert({ report_id:rid, reviewer_id:S.user.id, vote:vote, reason:reason||null });
+    }).then(function(ins){
+      if(ins==='ya') return;
       if(ins.error){ if(ins.error.code==='23505') return; throw ins.error; }
       S.myReviewedReports[rid]=1; S.stats.reviews+=1; $('statReviews').textContent=S.stats.reviews;
       // Las revisiones son tarea del equipo: no suman puntos ni ranking

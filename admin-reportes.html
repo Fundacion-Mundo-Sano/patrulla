@@ -279,6 +279,7 @@ kbd{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px
 .md-reasons{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .md-reasons button{font-family:inherit;font-size:12.5px;font-weight:700;border-radius:9px;padding:8px 10px;cursor:pointer;border:1px solid rgba(226,105,95,.4);background:rgba(226,105,95,.12);color:var(--cream)}
 .md-adm{margin-top:4px}
+.md-flaglink{display:block;margin-top:10px;background:none;border:none;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:700;text-decoration:underline;cursor:pointer;padding:4px 0}
 .md-keys{font-size:12px;color:var(--muted);margin-top:10px}
 .md-keys kbd{margin:0 1px}
 .md-zoom{position:fixed;inset:0;z-index:50;background:rgba(10,6,12,.94);display:flex;align-items:center;justify-content:center;cursor:zoom-out;outline:none}
@@ -335,7 +336,7 @@ kbd{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px
     <div class="mod-list" id="modList" role="listbox" aria-label="Reportes que necesitan atención"><div class="panel-loading"><div class="spinner"></div>Cargando…</div></div>
     <section class="mod-detail" id="modDetail" aria-label="Reporte seleccionado"></section>
   </div>
-  <div class="md-keys" aria-hidden="true">Atajos: <kbd>↑</kbd><kbd>↓</kbd> o <kbd>J</kbd><kbd>K</kbd> moverse · <kbd>V</kbd> validar · <kbd>D</kbd> rechazar/descartar (y <kbd>1</kbd>–<kbd>5</kbd> motivo) · <kbd>Z</kbd> ampliar foto<span class="solo-admin"> · <kbd>R</kbd> devolver a revisión · <kbd>M</kbd> escribir mensaje · <kbd>Esc</kbd> salir del mensaje</span></div>
+  <div class="md-keys" aria-hidden="true">Atajos: <kbd>↑</kbd><kbd>↓</kbd> o <kbd>J</kbd><kbd>K</kbd> moverse · <kbd>V</kbd> validar · <kbd>D</kbd> rechazar/descartar (y <kbd>1</kbd>–<kbd>3</kbd> motivo) · <kbd>Z</kbd> ampliar foto<span class="solo-admin"> · <kbd>R</kbd> devolver a revisión · <kbd>M</kbd> escribir mensaje · <kbd>Esc</kbd> salir del mensaje</span></div>
   <div id="revPanel" class="hide">
     <div class="mod-card" style="grid-template-columns:1fr">
       <div>
@@ -618,7 +619,11 @@ kbd{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px
               '<button class="ok" data-v="correcto">✅ Validar <kbd>V</kbd></button>'+
               '<button data-v="rechazar">❌ Rechazar <kbd>D</kbd></button>'+
             '</div>'+
-            '<div class="md-reasons hide" id="mdReasons">'+REASONS.map(function(rz,i){ return '<button type="button" data-reason="'+rz[0]+'"><kbd>'+(i+1)+'</kbd> '+esc(rz[1])+'</button>'; }).join('')+'</div></div>' : '')+
+            '<div class="md-reasons hide" id="mdReasons">'+REASONS.map(function(rz,i){ return '<button type="button" data-reason="'+rz[0]+'"><kbd>'+(i+1)+'</kbd> '+esc(rz[1])+'</button>'; }).join('')+'</div>'+
+            (ADMIN ? '' :
+              '<button type="button" class="md-flaglink" id="mdFlagOpen">🚩 Marcar como inadecuado (lo ve un administrador)</button>'+
+              '<div class="md-reasons hide" id="mdFlags">'+FLAG_MOTIVOS.map(function(m){ return '<button type="button" data-flag="'+m[0]+'">'+esc(m[1])+'</button>'; }).join('')+'</div>')+
+            '</div>' : '')+
           (ADMIN ?
           '<div class="md-adm">'+
           '<label class="md-lbl" for="mdMsg">'+(k.revisar?'Mensaje para el autor <span>(para el aviso de mal uso)</span>':'Mensaje para el autor <span>(opcional; si lo dejás vacío se usa un texto estándar)</span>')+'</label>'+
@@ -655,15 +660,33 @@ kbd{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px
     if(bv) bv.addEventListener('click', function(){ vote(it, 'correcto'); });
     if(br) br.addEventListener('click', function(){ showReasons(); });
     box.querySelectorAll('[data-reason]').forEach(function(b){ b.addEventListener('click', function(){ vote(it, 'rechazado', b.getAttribute('data-reason')); }); });
+    var fo=$('mdFlagOpen');
+    if(fo) fo.addEventListener('click', function(){ $('mdFlags').classList.remove('hide'); fo.classList.add('hide'); });
+    box.querySelectorAll('[data-flag]').forEach(function(b){
+      b.addEventListener('click', function(){
+        busy(true);
+        db.rpc('denunciar_reporte', { p_report_id:it.id, p_motivo:b.getAttribute('data-flag'), p_comentario:null }).then(function(r){
+          if(r.error){ busy(false); return res(false,'No se pudo: '+r.error.message); }
+          toast('🚩 #'+it.id+' enviado a un administrador'); quitar(it.id);
+        }, function(){ busy(false); res(false,'No se pudo: revisá la conexión.'); });
+      });
+    });
   }
 
   // ---------- Votar como revisor/a (igual que en la app) ----------
-  var REASONS=[['falso','Foto falsa o de internet'],['incorrecto','No muestra la acción'],['borrosa','Foto borrosa o confusa'],['no_corresponde','No corresponde a la categoría'],['dudoso','Dudoso']];
+  // Mismos motivos y textos que la pestaña Revisar de la app
+  var REASONS=[['falso','🚫 Es falso'],['incorrecto','🎯 Es incorrecto'],['borrosa','🌫️ Borrosa o poco visible']];
+  var FLAG_MOTIVOS=[['ofensivo','🤬 Ofensivo o inapropiado'],['privacidad','👤 Muestra personas o datos privados'],['falso','🎭 Engaño o foto repetida'],['spam','📢 Spam o sin relación']];
   function showReasons(){ var r=$('mdReasons'); if(r){ r.classList.remove('hide'); var f=r.querySelector('button'); if(f) f.focus(); } }
   function vote(it, v, reason){
     busy(true);
     var row={ report_id:it.id, reviewer_id:ME.id, vote:v }; if(reason) row.reason=reason;
-    db.from('report_reviews').insert(row).then(function(r){
+    // La app revisa la misma cola: si otra persona ya lo resolvió, no se vota dos veces
+    db.from('reports').select('status').eq('id', it.id).maybeSingle().then(function(st){
+      if(st && st.data && st.data.status && st.data.status!=='pendiente'){ toast('Otra persona del equipo ya revisó #'+it.id); quitar(it.id); return null; }
+      return db.from('report_reviews').insert(row);
+    }).then(function(r){
+      if(r===null) return;
       if(r.error){ busy(false); return res(false,'No se pudo votar: '+r.error.message); }
       it.ya_vote=true;
       return db.from('reports').select('status').eq('id', it.id).maybeSingle().then(function(s2){
@@ -790,7 +813,7 @@ kbd{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px
     else if(!it) return;
     else if((k==='v' || k==='a') && kindsOf(it).revisar){ vote(it,'correcto'); e.preventDefault(); }
     else if((k==='d' || k==='x') && kindsOf(it).revisar){ showReasons(); e.preventDefault(); }
-    else if(/^[1-5]$/.test(k) && $('mdReasons') && !$('mdReasons').classList.contains('hide')){ vote(it,'rechazado',REASONS[+k-1][0]); e.preventDefault(); }
+    else if(/^[1-9]$/.test(k) && +k<=REASONS.length && $('mdReasons') && !$('mdReasons').classList.contains('hide')){ vote(it,'rechazado',REASONS[+k-1][0]); e.preventDefault(); }
     else if(!ADMIN) return;
     else if(k==='v'){ act(it,'validar'); e.preventDefault(); }
     else if(k==='d'){ act(it,'descartar'); e.preventDefault(); }
@@ -843,6 +866,13 @@ kbd{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px
   }
   $('revAdd').addEventListener('click', function(){ setRevisor($('revEmail').value.trim(), true); });
   $('modRefresh').addEventListener('click', function(){ load(true); });
+  // Actualización silenciosa cada minuto, para ver lo que resuelven otras personas
+  // (desde aquí o desde la app). No se actualiza mientras escribís o mirás una foto.
+  setInterval(function(){
+    if(!ME || document.hidden || ZOOM || !$('revPanel').classList.contains('hide')) return;
+    var a=document.activeElement; if(a && (a.tagName==='TEXTAREA' || a.tagName==='INPUT')) return;
+    load(true);
+  }, 60000);
   db.auth.getSession().then(function(r){ checkAdmin(r.data && r.data.session); });
 })();
 </script>
