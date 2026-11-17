@@ -129,6 +129,16 @@ h1,h2,h3,h4{font-family:'DM Serif Display',serif;font-weight:400;letter-spacing:
 .section{display:none}
 .section.active{display:block;animation:fade .25s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
+/* Detectar criaderos: aviso rápido al terminar (se va solo) */
+.spot-done{position:fixed;inset:0;z-index:1150;display:flex;align-items:center;justify-content:center;pointer-events:none;padding:24px}
+.spot-done-card{background:var(--primary);color:#fff;border-radius:22px;padding:22px 26px;text-align:center;box-shadow:0 18px 50px rgba(20,10,25,.45);max-width:320px;animation:spotDoneIn .45s cubic-bezier(.2,1.4,.4,1) both}
+.spot-done.out .spot-done-card{animation:spotDoneOut .35s ease forwards}
+.spot-done-emoji{font-size:54px;line-height:1}
+.spot-done-title{font-family:'DM Serif Display',serif;font-size:24px;margin:8px 0 4px;line-height:1.2}
+.spot-done-pts{display:inline-block;margin-top:8px;background:var(--secondary);color:var(--primary);font-weight:800;font-size:15px;padding:6px 16px;border-radius:999px}
+@keyframes spotDoneIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes spotDoneOut{to{opacity:0;transform:scale(.92) translateY(-10px)}}
+@media (prefers-reduced-motion: reduce){ .spot-done-card,.spot-done.out .spot-done-card{animation:none} }
 .section-title{font-size:22px;color:var(--primary);margin-bottom:4px}
 .section-sub{color:var(--muted);font-size:13px;margin-bottom:14px;line-height:1.4}
 .loading{text-align:center;color:var(--muted);font-size:13px;padding:30px 0}
@@ -3298,6 +3308,16 @@ svg.z1 .rm-name:not(.main){display:none}
     });
   }
 
+  // Aviso de «¡desafío terminado!»: aparece en el centro y se va solo
+  function spotCelebrate(title, pts){
+    var old=document.querySelector('.spot-done'); if(old) old.remove();
+    var w=document.createElement('div'); w.className='spot-done'; w.setAttribute('role','status'); w.setAttribute('aria-live','polite');
+    w.innerHTML='<div class="spot-done-card"><div class="spot-done-emoji">🎉</div><div class="spot-done-title">'+esc(title)+'</div>'+
+      (pts>0 ? '<div class="spot-done-pts">+'+pts+' pts</div>' : '')+'</div>';
+    document.body.appendChild(w);
+    setTimeout(function(){ w.classList.add('out'); setTimeout(function(){ w.remove(); }, 400); }, 2300);
+  }
+
   function openSpotGame(ch){
     setSpotIntro(ch.intro);
     if(ch.modo==='marcas') return openSpotMarks(ch);
@@ -3375,8 +3395,13 @@ svg.z1 .rm-name:not(.main){display:none}
       return m;
     }
 
+    var celebrated=false;
     function checkComplete(){
       if(requiredFoundCount()>=requiredCount && requiredCount){
+        if(!celebrated && !revealed){
+          celebrated=true;
+          spotCelebrate(hasTypes ? '¡Encontraste todos los criaderos reales!' : '¡Encontraste todos los criaderos!', awarded ? 0 : ch.points);
+        }
         $('spotResult').innerHTML = hasTypes
           ? '<div class="spot-success">🎉 ¡Encontraste todos los criaderos reales!</div>'
           : '<div class="spot-success">🎉 ¡Encontraste todos los criaderos!</div>';
@@ -3389,7 +3414,7 @@ svg.z1 .rm-name:not(.main){display:none}
       S.mySpotDone[ch.id]=1;
       db.from('spot_answers').insert({ user_id:S.user.id, challenge_id:ch.id, found:Object.keys(found).length }).then(function(ins){
         if(ins.error){ if(ins.error.code==='23505') return; throw ins.error; }
-        return awardPoints(ch.points).then(function(){ toast('+'+ch.points+' pts · desafío completado 🎉'); });
+        return awardPoints(ch.points).then(function(){ if(!celebrated) toast('+'+ch.points+' pts · desafío completado 🎉'); });
       }).catch(function(e){ console.error(e); showErr(humanError(e,'No pudimos guardar tu desafío','Volvé a completarlo en un momento.')); });
     }
 
@@ -3480,10 +3505,11 @@ svg.z1 .rm-name:not(.main){display:none}
     });
     function finish(){
       $('spotResult').innerHTML='<div class="spot-success">🎉 ¡Ya sabés qué hacer con cada criadero!</div>';
+      spotCelebrate('¡Ya sabés qué hacer con cada criadero!', awarded ? 0 : ch.points);
       if(awarded) return; awarded=true; S.mySpotDone[ch.id]=1;
       db.from('spot_answers').insert({ user_id:S.user.id, challenge_id:ch.id, found:marks.length }).then(function(ins){
         if(ins.error){ if(ins.error.code==='23505') return; throw ins.error; }
-        if(ch.points>0) return awardPoints(ch.points).then(function(){ toast('+'+ch.points+' pts · desafío completado 🎉'); });
+        if(ch.points>0) return awardPoints(ch.points);   // el aviso de fin ya muestra los puntos
       }).catch(function(e){ console.error(e); });
     }
     if(awarded){ $('spotResult').innerHTML='<div class="spot-success">✓ Ya completaste este desafío. Podés volver a tocar las marcas para repasar.</div>'; }
