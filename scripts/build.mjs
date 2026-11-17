@@ -37,6 +37,7 @@ const REQUIRED = [
 
 const OPTIONAL = [
   'caso2.jpg',
+  'badge-96.png',                // ícono monocromo de las notificaciones
 ];
 
 const LICENSES = [
