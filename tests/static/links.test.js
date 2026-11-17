@@ -55,7 +55,8 @@ describe('assets y PWA', () => {
     expect(manifest.icons.length).toBeGreaterThan(0);
 
     for (const icon of manifest.icons) {
-      const path = icon.src.replace(/^\.\//, '');
+      // Se ignora el ?v=N que fuerza a los móviles a bajar el ícono nuevo
+      const path = icon.src.replace(/^\.\//, '').split('?')[0];
       expect(existsSync(ROOT + path)).toBe(true);
     }
   });

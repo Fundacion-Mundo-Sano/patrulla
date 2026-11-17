@@ -78,7 +78,8 @@ describe('build estático', () => {
     });
 
     for (const reference of new Set(references)) {
-      expect(existsSync(DIST + reference.replace(/^\.\//, ''))).toBe(true);
+      // El ?v=N de los íconos es solo para forzar la descarga del archivo nuevo
+      expect(existsSync(DIST + reference.replace(/^\.\//, '').split('?')[0])).toBe(true);
     }
   });
 
