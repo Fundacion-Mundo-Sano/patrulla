@@ -5,7 +5,7 @@
    Resto de archivos (íconos, imágenes) → caché primero (carga rápida).
    Supabase (datos/fotos/auth) → siempre red, nunca se cachea.
 */
-const VERSION = 'patrulla-v13';
+const VERSION = 'patrulla-v14';
 const SHELL = [
   './',
   './index.html',
@@ -82,7 +82,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: data.body || '',
     icon: data.icon || 'icon-192.png',
-    badge: 'icon-192.png',
+    badge: 'badge-96.png',      // monocromo: Android lo pinta en la barra de estado
     lang: 'es-AR',
     tag: data.tag || undefined,
     renotify: false,

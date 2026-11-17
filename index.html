@@ -9,6 +9,7 @@
 <script>/* Evita que otra web muestre esta página dentro de un marco (clickjacking) */
 if(window.top!==window.self){document.documentElement.style.display='none';try{window.top.location=window.self.location.href;}catch(e){}}</script>
 
+<meta name="color-scheme" content="only light">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Patrulla Antimosquito · Fundación Mundo Sano</title>
 
@@ -383,6 +384,9 @@ svg.z1 .rm-name:not(.main){display:none}
 .tour-tooltip-actions{display:flex;gap:10px;align-items:center;justify-content:space-between}
 .tour-skip-btn{background:none;border:none;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;padding:11px 8px;min-height:44px;flex-shrink:0}
 .tour-tooltip-actions .btn{flex:1}
+#tourNext{background:var(--primary);color:#fff;border:none}
+#tourNext:hover{background:var(--primary-soft)}
+#tourNext:focus-visible{outline:3px solid var(--accent-2);outline-offset:2px}
 .onb-dot{width:8px;height:8px;border-radius:50%;background:#D8CBDA;transition:background .2s,width .2s}
 .onb-dot.on{background:var(--accent-2);width:22px;border-radius:999px}
 .onb-actions{display:flex;gap:8px}
@@ -556,11 +560,12 @@ svg.z1 .rm-name:not(.main){display:none}
 .spot-stage{position:relative;width:100%;border-radius:14px;overflow:visible;box-shadow:var(--shadow);line-height:0;background:#DDD1BD;touch-action:manipulation}
 .spot-stage img{width:100%;height:auto;display:block;border-radius:14px;-webkit-user-select:none;user-select:none}
 .spot-marker{position:absolute;transform:translate(-50%,-50%);pointer-events:none;z-index:3}
-.spot-hit{width:34px;height:34px;border-radius:50%;background:rgba(62,143,74,.28);border:3px solid var(--ok);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800;box-shadow:0 0 0 4px rgba(62,143,74,.18);animation:pop .3s ease}
+.spot-hit{width:28px;height:28px;border-radius:50%;background:rgba(62,143,74,.28);border:3px solid var(--ok);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800;box-shadow:0 0 0 4px rgba(62,143,74,.18);animation:pop .3s ease}
 .spot-hit.reveal{background:rgba(226,155,46,.22);border-color:var(--warn)}
 /* Tipos nuevos (caso 2): no afectan a .spot-hit ni a .spot-hit.reveal de arriba */
 .spot-hit.type-warn{background:rgba(226,155,46,.28);border-color:var(--warn);box-shadow:0 0 0 4px rgba(226,155,46,.18)}
 .spot-hit.type-no{background:rgba(194,55,47,.28);border-color:var(--danger);box-shadow:0 0 0 4px rgba(194,55,47,.18)}
+.spot-marker.fadeout{opacity:0;transition:opacity .4s ease}
 .spot-hit.reveal-typed{border-style:dashed;opacity:.92}
 .spot-legend{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:11px;color:var(--muted);margin:8px 0 4px}
 .spot-legend span{display:inline-flex;align-items:center;gap:4px}
@@ -3346,7 +3351,7 @@ svg.z1 .rm-name:not(.main){display:none}
       var m=el('div','spot-marker'); m.style.left=(hx*100)+'%'; m.style.top=(hy*100)+'%';
       m.innerHTML='<div class="'+cls+'">'+(txt||'')+'</div>';
       $('spotStage').appendChild(m);
-      if(!label) return;
+      if(!label) return m;
       var l=el('div','spot-label',esc(label));
       l.style.left=(hx*100)+'%'; l.style.top=(hy*100)+'%';
       $('spotStage').appendChild(l);
@@ -3367,6 +3372,7 @@ svg.z1 .rm-name:not(.main){display:none}
           setTimeout(function(){ if(l.parentNode) l.parentNode.removeChild(l); }, 450);
         }, 3500);
       }
+      return m;
     }
 
     function checkComplete(){
@@ -3400,7 +3406,12 @@ svg.z1 .rm-name:not(.main){display:none}
       }
       if(hitIdx>=0){
         found[hitIdx]=1; var hs=hotspots[hitIdx];
-        placeMarker(hs.x, hs.y, markerClass(hs.type,false), markerIcon(hs.type), hs.label);
+        var mk=placeMarker(hs.x, hs.y, markerClass(hs.type,false), markerIcon(hs.type), hs.label);
+        if(hs.type==='no'){
+          // La cruz roja dura lo mismo que el rótulo y se va: no ensucia la foto
+          delete found[hitIdx];   // se puede volver a tocar para releerlo
+          setTimeout(function(){ mk.classList.add('fadeout'); setTimeout(function(){ if(mk.parentNode) mk.parentNode.removeChild(mk); }, 450); }, 3500);
+        }
         $('spotInfo').className = 'spot-info'+(hs.type==='warn'?' warn':(hs.type==='no'?' no':''));
         $('spotInfo').innerHTML = spotInfoHtml(hs);
         updateCount(); checkComplete();
@@ -3412,11 +3423,29 @@ svg.z1 .rm-name:not(.main){display:none}
 
     $('spotReveal').addEventListener('click', function(){
       if(revealed) return; revealed=true;
-      hotspots.forEach(function(hs,i){ if(!found[i]) placeMarker(hs.x, hs.y, markerClass(hs.type,true), hasTypes?markerIcon(hs.type):'!', hs.label, { persistent:true }); });
-      $('spotResult').innerHTML = hasTypes
+      // Los que no encontraste se marcan en la foto (sin rótulos encima, para que no se pisen);
+      // debajo aparece la lista completa para repasar cada elemento con calma.
+      hotspots.forEach(function(hs,i){
+        if(!found[i] && hs.type!=='no') placeMarker(hs.x, hs.y, markerClass(hs.type,true), hasTypes?markerIcon(hs.type):'!', null);
+      });
+      var groups = hasTypes
+        ? [['ok','✓ Criaderos reales'],['warn','! A vigilar'],['no','✕ No son criaderos']]
+        : [['', 'Focos de la foto']];
+      $('spotInfo').className='spot-info';
+      $('spotInfo').innerHTML = groups.map(function(g){
+        var items=hotspots.filter(function(h){ return hasTypes ? (h.type||'ok')===g[0] : true; });
+        if(!items.length) return '';
+        return '<b>'+g[1]+'</b><ul>'+items.map(function(h){
+          return '<li>'+esc(h.label||'')+(h.info?' <span style="color:var(--muted)">— '+esc(h.info)+'</span>':'')+'</li>';
+        }).join('')+'</ul>';
+      }).join('');
+      var all = requiredFoundCount()>=requiredCount;
+      $('spotResult').innerHTML = all
+        ? '<div class="spot-success">🎉 Debajo tenés todos los elementos de la foto para repasarlos. ¡Buen ojo!</div>'
+        : hasTypes
         ? '<div class="spot-success" style="background:#FBF3E0;color:#8A6A1E">Así quedaron clasificados todos los elementos. ¡El ojo se entrena mirando seguido!</div>'
         : '<div class="spot-success" style="background:#FBF3E0;color:#8A6A1E">Estos son los focos. Recordá revisarlos en tu casa cada semana.</div>';
-      this.disabled=true;
+      this.disabled=true; this.textContent='Solución a la vista';
       completeChallenge();
     });
 
@@ -4034,14 +4063,21 @@ svg.z1 .rm-name:not(.main){display:none}
       var apForm=wrap.querySelector('.myrep-appeal-form');
       apBtn.addEventListener('click', function(){ apBtn.style.display='none'; apForm.style.display='block'; });
       wrap.querySelector('[data-act="appealcancel"]').addEventListener('click', function(){ apForm.style.display='none'; apBtn.style.display=''; });
-      wrap.querySelector('[data-act="appealsend"]').addEventListener('click', function(){
+      var sendBtn=wrap.querySelector('[data-act="appealsend"]');
+      sendBtn.addEventListener('click', function(){
+        if(sendBtn.disabled) return;            // un segundo toque no vuelve a enviar
+        sendBtn.disabled=true; sendBtn.textContent='Enviando…';
         var txt=apForm.querySelector('textarea').value.trim();
         db.rpc('pedir_segunda_opinion', { p_report_id:r.id, p_comentario:txt||null }).then(function(res){
           if(res.error) throw res.error;
           MY_APPEALS[r.id]=1;
-          wrap.querySelector('.myrep-appeal').outerHTML='<div class="myrep-appeal-done">🛟 Pediste una segunda opinión: la revisa el equipo</div>';
+          var box=wrap.querySelector('.myrep-appeal');
+          if(box) box.outerHTML='<div class="myrep-appeal-done">🛟 Pediste una segunda opinión: la revisa el equipo</div>';
           toast('Listo: un administrador va a revisar tu reporte');
-        }).catch(function(e){ showErr(humanError(e,'No pudimos enviar tu pedido','Intentá de nuevo en un momento.')); });
+        }).catch(function(e){
+          sendBtn.disabled=false; sendBtn.textContent='Enviar';
+          showErr(humanError(e,'No pudimos enviar tu pedido','Intentá de nuevo en un momento.'));
+        });
       });
     }
     var noteEl=wrap.querySelector('.myrep-note'), ta=wrap.querySelector('textarea');
