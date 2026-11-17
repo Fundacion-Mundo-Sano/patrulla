@@ -5,7 +5,7 @@
    Resto de archivos (íconos, imágenes) → caché primero (carga rápida).
    Supabase (datos/fotos/auth) → siempre red, nunca se cachea.
 */
-const VERSION = 'patrulla-v15';
+const VERSION = 'patrulla-v16';
 const SHELL = [
   './',
   './index.html',
@@ -23,7 +23,9 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL).catch(() => {})));
+  // cache: 'reload' → baja los archivos del servidor, no de la caché del navegador
+  // (así un ícono o logo nuevo no se queda con la versión vieja guardada 7 días)
+  event.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' }))).catch(() => {})));
   self.skipWaiting();
 });
 
