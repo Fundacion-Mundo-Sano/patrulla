@@ -1782,7 +1782,7 @@ svg.z1 .rm-name:not(.main){display:none}
     { key:'revisor',  label:'🔍 Reportes por revisar', desc:'Si hay cola de revisión (solo revisores).' }
   ];
   function normalizePushPrefs(p){
-    var d={ rutina:true, contenido:true, comunidad:true, riesgo:true, revisor:true, quietStart:22, quietEnd:8 };
+    var d={ rutina:true, contenido:true, comunidad:true, riesgo:true, revisor:true };
     if(p && typeof p==='object'){ for(var k in d){ if(p[k]!==undefined) d[k]=p[k]; } }
     return d;
   }
@@ -1871,14 +1871,11 @@ svg.z1 .rm-name:not(.main){display:none}
         return '<div class="meta-row" style="padding:8px 0"><div><div class="meta-label" style="font-size:13px">'+c.label+'</div><div class="meta-sub">'+c.desc+'</div></div>'+
           '<label class="switch"><input type="checkbox" class="pushcat" data-k="'+c.key+'"'+(pr[c.key]?' checked':'')+'><span class="slider"></span></label></div>';
       }).join('');
-      var hoursOpts=function(sel){ var s=''; for(var i=0;i<24;i++){ s+='<option value="'+i+'"'+(i===sel?' selected':'')+'>'+(i<10?'0':'')+i+':00</option>'; } return s; };
       panel.innerHTML =
         '<div class="meta-row" style="padding:4px 0 10px;border-bottom:1px solid #EDE3EF;margin-bottom:8px"><div><div class="meta-label">Recibir notificaciones</div><div class="meta-sub">Activá para no perderte la ronda semanal.</div></div>'+
           '<label class="switch"><input type="checkbox" id="pushMaster"'+(on?' checked':'')+'><span class="slider"></span></label></div>'+
         '<div id="pushDetail" class="'+(on?'':'hide')+'">'+
           cats+
-          '<div style="display:flex;gap:8px;margin-top:10px"><div class="field" style="flex:1;margin:0"><label>No molestar desde</label><select id="pushQS">'+hoursOpts(pr.quietStart)+'</select></div>'+
-          '<div class="field" style="flex:1;margin:0"><label>hasta</label><select id="pushQE">'+hoursOpts(pr.quietEnd)+'</select></div></div>'+
           '<div class="setting-msg" id="pushMsg"></div>'+
           '<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-secondary" id="pushTest">Probar 🔔</button><button class="btn btn-accent" id="pushSave">Guardar</button></div>'+
         '</div>';
@@ -1897,7 +1894,6 @@ svg.z1 .rm-name:not(.main){display:none}
         $('pushTest').addEventListener('click', sendTestNotification);
         $('pushSave').addEventListener('click', function(){
           PUSH_CATS.forEach(function(c){ var chk=panel.querySelector('.pushcat[data-k="'+c.key+'"]'); if(chk) S.pushPrefs[c.key]=chk.checked; });
-          S.pushPrefs.quietStart=parseInt($('pushQS').value,10); S.pushPrefs.quietEnd=parseInt($('pushQE').value,10);
           savePushPrefs().then(function(res){ if(res.error) throw res.error; setMsgEl('pushMsg','ok','¡Preferencias guardadas!'); }, function(e){ setMsgEl('pushMsg','err','No se pudo guardar.'); });
         });
       }
