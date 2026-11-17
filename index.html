@@ -201,7 +201,6 @@ h1,h2,h3,h4{font-family:'DM Serif Display',serif;font-weight:400;letter-spacing:
 .rs-cap-line{display:inline-block;width:22px;border-top:2px dashed var(--primary)}
 .rs-avg span{position:absolute;right:0;top:-20px;z-index:3;font-size:10.5px;font-weight:800;color:var(--primary);background:var(--card);padding:0 4px;border-radius:4px}
 .navbtn{position:relative}
-.rm-sec.mine{stroke-width:3.5}
 .rm-mine-tag{display:inline-block;font-size:11px;font-weight:800;color:var(--primary);background:#F4D18B;border-radius:999px;padding:2px 8px;margin-bottom:4px}
 .rs-col.mine .rs-lbl{color:var(--primary);font-weight:800}
 .rs-col.mine .rs-bar{outline:2px solid var(--primary);outline-offset:1px}
@@ -225,17 +224,22 @@ h1,h2,h3,h4{font-family:'DM Serif Display',serif;font-weight:400;letter-spacing:
 .risk-map{position:relative;border-radius:12px;overflow:hidden;background:#F6F1E8}
 .risk-map svg{display:block;width:100%;height:auto;touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .rm-bg{fill:#F6F1E8}
-.rm-fill{fill:#CDBFD0;fill-opacity:.45;stroke:none}
+.rm-fill{fill:#CDBFD0;fill-opacity:.4;stroke:none;transition:fill-opacity .15s}
 .rm-fill.bajo{fill:var(--ok)} .rm-fill.medio{fill:var(--warn)} .rm-fill.alto{fill:var(--danger)}
 .rm-road{fill:none;stroke:#9C8FA0;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none}
 .rm-road.trunk,.rm-road.motorway{stroke:#5A4560}
 .rm-road.primary,.rm-road.secondary,.rm-road.tertiary{stroke:#7C6C84}
 .rm-road.rail{stroke:#8A6A4A;stroke-dasharray:6 4}
-.rm-sec{fill:transparent;stroke:#331F3A;stroke-width:2;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer}
-.rm-sec:hover{fill:rgba(255,255,255,.12)}
-.rm-sec.sel{stroke-width:4;fill:rgba(255,255,255,.18)}
-.rm-sec:focus{outline:none} .rm-sec:focus-visible{stroke:var(--accent-2);stroke-width:5}
-.rm-lbl{pointer-events:none} .rm-lbl circle{fill:#331F3A} .rm-lbl text{fill:#fff;font:800 34px Raleway,sans-serif;text-anchor:middle}
+.rm-fill.bajo,.rm-fill.medio,.rm-fill.alto{fill-opacity:.5}
+/* Entre sectores, un hilo del color del fondo: se distinguen sin bordes oscuros */
+.rm-sec{fill:transparent;stroke:#F6F1E8;stroke-width:2;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer}
+.rm-sec:hover{fill:rgba(255,255,255,.14)}
+.rm-sec:focus{outline:none} .rm-sec:focus-visible{fill:rgba(255,255,255,.2)}
+/* Sector elegido: solo él lleva borde, por encima de los demás */
+.rm-selborder{fill:rgba(255,255,255,.16);stroke:var(--primary);stroke-width:2.5;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none}
+.rm-lbl{pointer-events:none} .rm-lbl circle{fill:var(--primary);transition:fill .15s} .rm-lbl text{fill:#fff;font:800 34px Raleway,sans-serif;text-anchor:middle}
+.rm-lbl.mine circle{stroke:var(--accent);stroke-width:6}
+.rm-lbl.sel circle{fill:var(--accent);stroke:#fff;stroke-width:6} .rm-lbl.sel text{fill:var(--primary)}
 .rm-name{pointer-events:none} .rm-name text{font:700 30px Raleway,sans-serif;fill:#4A2F54;text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:#F6F1E8;stroke-width:9px;stroke-linejoin:round}
 svg.z1 .rm-name:not(.main){display:none}
 .rm-zoom{position:absolute;top:8px;left:8px;display:flex;flex-direction:column;gap:6px}
@@ -2429,14 +2433,15 @@ svg.z1 .rm-name:not(.main){display:none}
     function pathOf(line){ return 'M'+line.map(function(p){ var q=px(p); return q[0].toFixed(1)+','+q[1].toFixed(1); }).join('L'); }
     M.H=H;
 
-    var fills='', outlines='', labels='', roads='', names='';
+    var fills='', outlines='', labels='', roads='', names='', selBorder='';
     M.sectors.slice().sort(sectorSort).forEach(function(s){
       var f=M.fill(s), d=sectorRings(s.geom).map(function(ring){ return pathOf(ring)+'Z'; }).join('');
       fills+='<path class="rm-fill '+f.cls+'" d="'+d+'" fill-rule="evenodd"/>';
+      if(M.sel===s.sector) selBorder='<path class="rm-selborder" d="'+d+'" fill-rule="evenodd"/>';
       outlines+='<path class="rm-sec'+(M.sel===s.sector?' sel':'')+(M.mine===s.sector?' mine':'')+'" data-sec="'+esc(s.sector)+'" d="'+d+'" fill-rule="evenodd" tabindex="0" role="button" aria-label="'+esc(f.aria)+'"/>';
       var outer=sectorRings(s.geom)[0]; if(!outer) return;
       var c=px(ringCentroid(outer));
-      labels+='<g class="rm-lbl" data-x="'+c[0].toFixed(1)+'" data-y="'+c[1].toFixed(1)+'"><circle r="34"/><text dy="12">'+esc(s.sector)+'</text></g>';
+      labels+='<g class="rm-lbl'+(M.sel===s.sector?' sel':'')+(M.mine===s.sector?' mine':'')+'" data-x="'+c[0].toFixed(1)+'" data-y="'+c[1].toFixed(1)+'"><circle r="34"/><text dy="12">'+esc(s.sector)+'</text></g>';
     });
 
     var calles=M.calles || [];
@@ -2471,7 +2476,7 @@ svg.z1 .rm-name:not(.main){display:none}
     box.innerHTML =
       '<svg viewBox="0 0 '+RM_W+' '+H+'" role="group" aria-label="'+esc(M.aria||'Mapa de sectores')+'">'+
         '<rect class="rm-bg" x="-5000" y="-5000" width="'+(RM_W+10000)+'" height="'+(H+10000)+'"/>'+
-        fills+'<g class="rm-roads">'+roads+'</g>'+outlines+'<g class="rm-names">'+names+'</g>'+labels+
+        fills+'<g class="rm-roads">'+roads+'</g>'+outlines+selBorder+'<g class="rm-names">'+names+'</g>'+labels+
       '</svg>'+
       '<div class="rm-zoom">'+
         '<button type="button" data-z="in" aria-label="Acercar">+</button>'+
@@ -2594,6 +2599,7 @@ svg.z1 .rm-name:not(.main){display:none}
       return { cls:nivel, aria:(RM.mine===s.sector?'Tu sector, ':'')+name+': '+(r && r.nivel ? 'riesgo '+r.nivel+(r.edi!=null?', EDI '+nf(r.edi):'') : 'sin dato esta semana') };
     };
     RM.onPick=function(sec){ showSectorInfo(sec); };
+    RM.redrawOnPick=true;   // para mover el borde y el círculo resaltado al sector tocado
     drawSectorMap(RM);
   }
 
