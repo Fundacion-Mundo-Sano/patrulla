@@ -39,6 +39,13 @@ const OPTIONAL = [
   'caso2.jpg',
   'badge-96.png',                // ícono monocromo de las notificaciones
   'icon-neumatico.png',          // ícono de «Neumáticos y objetos grandes» (no hay emoji sin llanta)
+  // Detectar criaderos: fotos de los patios (SQL 43)
+  'patio01.jpg',
+  'patio02.jpg',
+  'patio03.jpg',
+  'patio04.jpg',
+  'patio05.jpg',
+  'patio06.jpg',
 ];
 
 const LICENSES = [
