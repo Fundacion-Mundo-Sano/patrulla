@@ -287,6 +287,7 @@ svg.z1 .rm-name:not(.main){display:none}
 .btn:disabled{background:#B8AEB8;cursor:not-allowed}
 .btn-secondary{background:transparent;color:var(--primary);border:2px solid var(--primary)}
 .btn-secondary:hover{background:var(--primary);color:#fff}
+.ic-img{display:inline-block;width:1.05em;height:1.05em;vertical-align:-0.15em;object-fit:contain}
 .btn-accent{background:linear-gradient(135deg,var(--accent),var(--secondary));color:var(--primary)}
 .btn-accent:hover{filter:brightness(1.05)}
 .photo-drop{display:block;border:2px dashed var(--primary-soft);border-radius:14px;padding:24px 14px;text-align:center;background:#FBF7EF;cursor:pointer;transition:background .2s;margin-bottom:12px}
@@ -1226,6 +1227,10 @@ svg.z1 .rm-name:not(.main){display:none}
   };
 
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  // Ícono de acción: emoji de action_types.icon, o «svg:nombre» para una imagen propia (p. ej. neumático sin llanta)
+  var ACTION_SVG={ neumatico:'<img class="ic-img" src="icon-neumatico.png" alt="" aria-hidden="true">' };
+  function actionIcon(a, fb){ var ic=(a&&a.icon)||fb||''; return /^svg:/.test(ic) ? (ACTION_SVG[ic.slice(4)]||esc(fb||'📍')) : esc(ic); }
+
   // Solo fotos del Storage del proyecto (defensa extra; la base ya lo exige desde el SQL 23)
   function fotoOk(u){ u=String(u||''); return u.indexOf(SUPABASE_URL+'/storage/v1/object/')===0 && !/[\s"'<>\\]/.test(u) ? u : ''; }
 
@@ -2647,7 +2652,7 @@ svg.z1 .rm-name:not(.main){display:none}
         var card=el('button','action-card');
         card.type='button';
         card.innerHTML =
-          '<div class="action-icon" aria-hidden="true">'+esc(a.icon||'📍')+'</div>'+
+          '<div class="action-icon" aria-hidden="true">'+actionIcon(a,'📍')+'</div>'+
           '<div class="action-title">'+esc(a.title)+'</div>'+
           '<span class="pts">+'+a.points+' pts</span>';
         card.setAttribute('aria-label', a.title+', +'+a.points+' pts. Tocá para reportar esta acción.');
@@ -2716,7 +2721,7 @@ svg.z1 .rm-name:not(.main){display:none}
   // Modal de información de una acción (disponible siempre desde la card o el flujo)
   function openActionInfo(a){
     $('actionInfoBody').innerHTML =
-      '<div class="info-ic">'+esc(a.icon||'📍')+'</div>'+
+      '<div class="info-ic">'+actionIcon(a,'📍')+'</div>'+
       '<h3>'+esc(a.title)+'</h3>'+
       '<p><b>Qué hacer:</b> '+esc(a.description||'Reportá esta acción con una foto.')+'</p>'+
       '<p style="color:var(--muted)">Sumás <b>+'+a.points+' pts</b> al reportarla'+(a.location?(' · '+esc(cap(a.location))):'')+'.</p>'+
@@ -2868,7 +2873,7 @@ svg.z1 .rm-name:not(.main){display:none}
       markIntroSeen(a.id);
       flow.innerHTML =
         '<div class="flow-header"><button class="flow-back" id="fCancel">← Cancelar</button><span class="step-pill">Info</span></div>'+
-        '<div class="step-card"><div class="step-icon-big">'+esc(a.icon||'📍')+'</div>'+
+        '<div class="step-card"><div class="step-icon-big">'+actionIcon(a,'📍')+'</div>'+
         '<div class="step-title">'+esc(a.title)+'</div>'+
         '<div class="step-desc"><b>Qué hacer:</b> '+esc(a.description||'')+'</div>'+
         '<div class="step-meta"><span class="pts">+'+a.points+' pts</span></div>'+
@@ -2902,7 +2907,7 @@ svg.z1 .rm-name:not(.main){display:none}
           '<div><div class="slot-label">Antes</div><div class="photo-preview small">'+(pvB?'<img src="'+pvB+'" alt="">':'📷')+'</div></div>'+
           '<div><div class="slot-label">Después</div><div class="photo-preview small">'+(pvA?'<img src="'+pvA+'" alt="">':'📷')+'</div></div></div>';
       } else {
-        previewHtml = '<div class="photo-preview">'+(pvA?'<img src="'+pvA+'" alt=""><span class="check">✔</span>':esc(a.icon||'📍'))+'</div>';
+        previewHtml = '<div class="photo-preview">'+(pvA?'<img src="'+pvA+'" alt=""><span class="check">✔</span>':actionIcon(a,'📍'))+'</div>';
       }
       flow.innerHTML =
         '<div class="flow-header"><button class="flow-back" id="fB3">← Volver</button><span class="step-pill">Enviar</span></div>'+
@@ -3132,7 +3137,7 @@ svg.z1 .rm-name:not(.main){display:none}
           list.innerHTML='';
           pend.forEach(function(r){
             var a=actionById(r.action_type)||{};
-            var thumb = r.photo_url ? '<img src="'+FOTO_PIXEL+'" data-foto="'+esc(fotoOk(r.photo_url))+'" alt="">' : (a.icon||'📷');
+            var thumb = r.photo_url ? '<img src="'+FOTO_PIXEL+'" data-foto="'+esc(fotoOk(r.photo_url))+'" alt="">' : actionIcon(a,'📷');
             var baBadge = r.photo_before_url ? '<span class="ba-badge">A/D</span>' : '';
             var votes = r.review_count||0; var almost = votes>=1;
             almost=false; var votesTxt = '🗳️ Pendiente';
@@ -3140,7 +3145,7 @@ svg.z1 .rm-name:not(.main){display:none}
             item.innerHTML =
               '<div class="review-thumb" style="position:relative">'+baBadge+thumb+'</div>'+
               '<div class="review-body"><div class="review-author">'+esc(names[r.user_id]||'Vecino/a')+'</div>'+
-              '<div class="review-action">'+esc(a.icon||'')+' '+esc(a.title||'Acción')+'</div>'+
+              '<div class="review-action">'+actionIcon(a,'')+' '+esc(a.title||'Acción')+'</div>'+
               '<div class="review-city">📍 '+esc(r.city||'—')+' · <span class="review-votes'+(almost?' almost':'')+'">'+votesTxt+'</span></div></div>'+
               '<button class="review-open">Ver reporte →</button>';
             r._author = names[r.user_id]||'Vecino/a';
@@ -3174,14 +3179,14 @@ svg.z1 .rm-name:not(.main){display:none}
         '</div>';
     } else {
       mp.className='modal-photo';
-      mp.innerHTML = r.photo_url ? '<img src="'+FOTO_PIXEL+'" data-foto="'+esc(fotoOk(r.photo_url))+'" alt="Foto del reporte: '+esc(a.title||'')+'">' : (a.icon||'📷');
+      mp.innerHTML = r.photo_url ? '<img src="'+FOTO_PIXEL+'" data-foto="'+esc(fotoOk(r.photo_url))+'" alt="Foto del reporte: '+esc(a.title||'')+'">' : actionIcon(a,'📷');
     }
     // reset del panel de rechazo
     var rr=$('rejectReasons'), vm=$('voteMain');
     if(rr){ rr.classList.remove('show'); } if(vm){ vm.style.display='flex'; }
     $('modalAuthor').textContent = r._author||'Vecino/a';
     $('modalCity').textContent = '📍 '+(r.city||'—');
-    $('modalActionIcon').textContent = a.icon||'🔄';
+    $('modalActionIcon').innerHTML = actionIcon(a,'🔄');
     $('modalActionText').textContent = a.title||'Acción';
     $('modalNote').textContent = r.note ? ('📝 "'+r.note+'"') : 'Sin nota adicional.';
 
@@ -4071,12 +4076,12 @@ svg.z1 .rm-name:not(.main){display:none}
 
   function buildMyRepItem(r){
     var a=actionById(r.action_type)||{};
-    var thumb = r.photo_url ? '<img class="myrep-thumb" src="'+FOTO_PIXEL+'" data-foto="'+esc(fotoOk(r.photo_url))+'" alt="">' : '<div class="myrep-thumb">'+esc(a.icon||'📷')+'</div>';
+    var thumb = r.photo_url ? '<img class="myrep-thumb" src="'+FOTO_PIXEL+'" data-foto="'+esc(fotoOk(r.photo_url))+'" alt="">' : '<div class="myrep-thumb">'+actionIcon(a,'📷')+'</div>';
     var wrap=el('div','myrep');
     wrap.innerHTML =
       thumb +
       '<div class="myrep-body">'+
-        '<div class="myrep-top"><span class="myrep-action">'+esc(a.icon||'')+' '+esc(a.title||'Acción')+'</span>'+
+        '<div class="myrep-top"><span class="myrep-action">'+actionIcon(a,'')+' '+esc(a.title||'Acción')+'</span>'+
         '<span class="myrep-st '+esc(r.status||'pendiente')+'">'+statusLabel(r.status)+'</span></div>'+
         '<div class="myrep-date">'+fmtDate(r.created_at)+' · 🗳️ '+(r.review_count||0)+' voto'+((r.review_count||0)===1?'':'s')+'</div>'+
         '<div class="myrep-note">'+(r.note?('“'+esc(r.note)+'”'):'<span style="color:var(--muted);font-style:normal">Sin nota</span>')+'</div>'+
