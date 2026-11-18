@@ -103,7 +103,7 @@ h1,h2,h3,h4{font-family:'DM Serif Display',serif;font-weight:400;letter-spacing:
 .setting-row .chev{color:var(--muted);font-weight:800;transition:transform .2s}
 .setting-row.open .chev{transform:rotate(90deg)}
 .setting-panel{background:#FBF7EF;border-radius:12px;padding:0 14px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
-.setting-panel.open{max-height:600px;padding:14px}
+.setting-panel.open{max-height:2400px;padding:14px}
 .setting-panel .field{margin-bottom:10px}
 .setting-panel label{display:block;font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
 .setting-panel input,.setting-panel select{width:100%;padding:11px 12px;border-radius:10px;border:1.5px solid #DFD3E1;font-family:inherit;font-size:14px;background:#fff;color:var(--text)}
@@ -831,7 +831,7 @@ svg.z1 .rm-name:not(.main){display:none}
         <div class="prog-view" id="prog-me">
           <div class="level-card">
             <div class="level-emoji" id="lvlEmoji">🥚</div>
-            <div class="level-name" id="lvlName">Vigilante Novato</div>
+            <div class="level-name" id="lvlName">Guardián Principiante</div>
             <div class="level-pts"><span id="lvlPts">0</span> pts</div>
             <div class="level-progress-outer"><div class="level-progress-inner" id="lvlBar" style="width:0%"></div></div>
             <div class="level-next" id="lvlNext"></div>
@@ -923,9 +923,9 @@ svg.z1 .rm-name:not(.main){display:none}
     </div>
 
     <nav class="bottomnav" aria-label="Navegación principal">
+      <button class="navbtn active" data-sec="reportar" aria-current="page"><span class="em">📸</span>Reportar</button>
       <button class="navbtn" data-sec="incidencia"><span class="em">📍</span>Riesgo</button>
       <button class="navbtn" data-sec="aprender"><span class="em">🧠</span>Aprender</button>
-      <button class="navbtn active" data-sec="reportar" aria-current="page"><span class="em">📸</span>Reportar</button>
       <button class="navbtn" data-sec="revisar"><span class="em">🔍</span>Revisar</button>
       <button class="navbtn" data-sec="progreso"><span class="em">🏆</span>Progreso</button>
     </nav>
@@ -1208,7 +1208,7 @@ svg.z1 .rm-name:not(.main){display:none}
   // ====================================================================
 
   var LEVELS = [
-    { emoji: '🥚', name: 'Vigilante Novato',      min: 0,    max: 49,   lvl: 1 },
+    { emoji: '🥚', name: 'Guardián Principiante',      min: 0,    max: 49,   lvl: 1 },
     { emoji: '🐛', name: 'Rastreador',            min: 50,   max: 149,  lvl: 2 },
     { emoji: '🦟', name: 'Cazador de Criaderos',  min: 150,  max: 349,  lvl: 3 },
     { emoji: '🛡️', name: 'Guardián del Barrio',   min: 350,  max: 699,  lvl: 4 },
@@ -1703,9 +1703,9 @@ svg.z1 .rm-name:not(.main){display:none}
   //  el primer reporte. Reemplaza al viejo banner persistente.
   // =====================================================================
   var APP_TOUR_STEPS = [
+    { sec:'reportar',   selector:'.navbtn[data-sec="reportar"]',   title:'📸 Reportar',   text:'El corazón de la Patrulla: reportá con una foto cada acción contra el mosquito.' },
     { sec:'incidencia', selector:'.navbtn[data-sec="incidencia"]', title:'📍 Nivel de riesgo', text:'Acá ves el nivel de riesgo de dengue en tu municipio y en tu sector, según las ovitrampas de Mundo Sano, semana a semana.' },
     { sec:'aprender',   selector:'.navbtn[data-sec="aprender"]',   title:'🧠 Aprender',   text:'Tips para leer con calma, y quizzes cortos para poner a prueba lo que sabés.' },
-    { sec:'reportar',   selector:'.navbtn[data-sec="reportar"]',   title:'📸 Reportar',   text:'El corazón de la Patrulla: reportá con una foto cada acción contra el mosquito.' },
     { sec:'progreso',   selector:'.navbtn[data-sec="progreso"]',   title:'🏆 Progreso',   text:'Tu nivel, tus estadísticas, y el ranking de tu municipio y tu región.' }
   ];
   var tourIdx=0;
