@@ -5,7 +5,7 @@
    Resto de archivos (íconos, imágenes) → caché primero (carga rápida).
    Supabase (datos/fotos/auth) → siempre red, nunca se cachea.
 */
-const VERSION = 'patrulla-v16';
+const VERSION = 'patrulla-v17';
 const SHELL = [
   './',
   './index.html',
@@ -19,6 +19,11 @@ const SHELL = [
   './raleway-latin-800-normal.woff2',
   './manifest.webmanifest',
   './icon-192.png',
+  './nav-reportar.png',
+  './nav-riesgo.png',
+  './nav-aprender.png',
+  './nav-revisar.png',
+  './nav-progreso.png',
   './icon-512.png',
 ];
 
