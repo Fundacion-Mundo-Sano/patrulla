@@ -290,7 +290,7 @@ svg.z1 .rm-name:not(.main){display:none}
 .btn:disabled{background:#B8AEB8;cursor:not-allowed}
 .btn-secondary{background:transparent;color:var(--primary);border:2px solid var(--primary)}
 @media (hover:hover){ .btn-secondary:hover{background:var(--primary);color:#fff} }
-.ic-img{display:inline-block;width:1.05em;height:1.05em;vertical-align:-0.15em;object-fit:contain}
+.ic-img{display:inline-block;width:1.3em;height:1.3em;vertical-align:-0.3em;object-fit:contain}
 .btn-accent{background:var(--accent);color:var(--primary)}
 .btn-accent:hover{background:var(--accent);color:var(--primary);filter:brightness(1.05)}
 .photo-drop{display:block;border:2px dashed var(--primary-soft);border-radius:14px;padding:24px 14px;text-align:center;background:#FBF7EF;cursor:pointer;transition:background .2s;margin-bottom:12px}
@@ -476,6 +476,8 @@ svg.z1 .rm-name:not(.main){display:none}
 .learn-card:focus-visible{outline:3px solid var(--accent-2);outline-offset:2px}
 .learn-card:hover{transform:translateY(-2px);border-color:var(--accent)}
 .learn-icon{font-size:44px;flex-shrink:0}
+.learn-icon .learn-ic{width:52px;height:52px;display:block}
+.section-title .sec-ic{width:1.15em;height:1.15em;vertical-align:-0.22em;margin-right:8px;display:inline-block}
 .learn-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--primary);line-height:1}
 .learn-sub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
 .learn-count{font-size:11px;color:var(--accent-2);font-weight:800;margin-top:6px}
@@ -763,7 +765,7 @@ svg.z1 .rm-name:not(.main){display:none}
 
       <!-- INCIDENCIA -->
       <section class="section" id="sec-incidencia">
-        <h2 class="section-title">📍 Nivel de riesgo local</h2>
+        <h2 class="section-title"><img class="sec-ic" src="nav-riesgo.png" alt="">Nivel de riesgo local</h2>
         <p class="section-sub">Riesgo de dengue según las ovitrampas de Mundo Sano, actualizado semana a semana.</p>
         <div id="incidenciaList"><div class="loading">Cargando…</div></div>
       </section>
@@ -771,7 +773,7 @@ svg.z1 .rm-name:not(.main){display:none}
       <!-- REPORTAR -->
       <section class="section active" id="sec-reportar">
         <div id="reportar-grid-view">
-          <h2 class="section-title">📸 Reportar acción</h2>
+          <h2 class="section-title"><img class="sec-ic" src="nav-reportar.png" alt="">Reportar acción</h2>
           <p class="section-sub">Elegí una acción, sacá una foto y ganá puntos por proteger tu barrio.</p>
           <div id="actionsGrid"><div class="loading">Cargando…</div></div>
         </div>
@@ -780,26 +782,26 @@ svg.z1 .rm-name:not(.main){display:none}
 
       <!-- REVISAR -->
       <section class="section" id="sec-revisar">
-        <h2 class="section-title">🔍 Revisar reportes</h2>
+        <h2 class="section-title"><img class="sec-ic" src="nav-revisar.png" alt="">Revisar reportes</h2>
         <div id="revisarBody"><div class="loading">Cargando…</div></div>
       </section>
 
       <!-- APRENDER -->
       <section class="section" id="sec-aprender">
         <div id="learn-menu-view">
-          <h2 class="section-title">🧠 Aprender</h2>
+          <h2 class="section-title"><img class="sec-ic" src="nav-aprender.png" alt="">Aprender</h2>
           <p class="section-sub">Conocé al mosquito y sumá puntos poniendo a prueba lo que aprendiste.</p>
           <div class="learn-menu">
-            <button type="button" class="learn-card" data-learn="resources"><div class="learn-icon" aria-hidden="true">📚</div><div><div class="learn-title">Tips</div><div class="learn-sub">Leé la información con calma, por tema.</div><div class="learn-count">Sin apuro, sin puntos</div></div></button>
-            <button type="button" class="learn-card" data-learn="tests"><div class="learn-icon" aria-hidden="true">📝</div><div><div class="learn-title">Quizzes</div><div class="learn-sub">Quizzes cortos por tema. Sumás puntos si acertás.</div><div class="learn-count">+pts por quiz</div></div></button>
-            <button type="button" class="learn-card" data-learn="spot"><div class="learn-icon" aria-hidden="true">🔍</div><div><div class="learn-title">Detectar criaderos</div><div class="learn-sub">Encontrá los focos de agua en la foto.</div><div class="learn-count">+pts por desafío</div></div></button>
+            <button type="button" class="learn-card" data-learn="resources"><div class="learn-icon" aria-hidden="true"><img class="learn-ic" src="ic-libro.png" alt=""></div><div><div class="learn-title">Tips</div><div class="learn-sub">Leé la información con calma, por tema.</div><div class="learn-count">Sin apuro, sin puntos</div></div></button>
+            <button type="button" class="learn-card" data-learn="tests"><div class="learn-icon" aria-hidden="true"><img class="learn-ic" src="ic-lapiz.png" alt=""></div><div><div class="learn-title">Quizzes</div><div class="learn-sub">Quizzes cortos por tema. Sumás puntos si acertás.</div><div class="learn-count">+pts por quiz</div></div></button>
+            <button type="button" class="learn-card" data-learn="spot"><div class="learn-icon" aria-hidden="true"><img class="learn-ic" src="ic-lupa.png" alt=""></div><div><div class="learn-title">Detectar criaderos</div><div class="learn-sub">Encontrá los focos de agua en la foto.</div><div class="learn-count">+pts por desafío</div></div></button>
           </div>
         </div>
 
         <!-- RECURSOS (antes "Tips"): lectura organizada por categoría, sin puntos -->
         <div id="learn-resources-view" class="hide">
           <button class="flow-back" data-learn="menu">← Volver</button>
-          <h2 class="section-title">📚 Tips</h2>
+          <h2 class="section-title"><img class="sec-ic" src="ic-libro.png" alt="">Tips</h2>
           <p class="section-sub">Todo lo que sabemos sobre prevención del dengue, organizado por tema. Tocá para leer.</p>
           <div id="resourcesList"></div>
         </div>
@@ -807,7 +809,7 @@ svg.z1 .rm-name:not(.main){display:none}
         <!-- TESTS (antes "Quizzes"): menú de tests temáticos + repaso general -->
         <div id="learn-tests-view" class="hide">
           <button class="flow-back" data-learn="menu">← Volver</button>
-          <h2 class="section-title">📝 Quizzes</h2>
+          <h2 class="section-title"><img class="sec-ic" src="ic-lapiz.png" alt="">Quizzes</h2>
           <p class="section-sub">Quizzes cortos de hasta 10 preguntas. Si te equivocás, te explicamos por qué.</p>
           <div id="testsMenuList"></div>
         </div>
@@ -821,7 +823,7 @@ svg.z1 .rm-name:not(.main){display:none}
 
         <div id="learn-spot-view" class="hide">
           <button class="flow-back" data-learn="menu">← Volver</button>
-          <h2 class="section-title">🔍 Detectar criaderos</h2>
+          <h2 class="section-title"><img class="sec-ic" src="ic-lupa.png" alt="">Detectar criaderos</h2>
           <p class="section-sub">Mirá la foto y tocá cada lugar donde el agua se puede estancar. Ahí es donde el mosquito pone huevos.</p>
           <div id="spotBody"><div class="loading">Cargando…</div></div>
         </div>
@@ -1236,8 +1238,8 @@ svg.z1 .rm-name:not(.main){display:none}
 
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   // Ícono de acción: emoji de action_types.icon, o «svg:nombre» para una imagen propia (p. ej. neumático sin llanta)
-  var ACTION_SVG={ neumatico:'<img class="ic-img" src="icon-neumatico.png" alt="" aria-hidden="true">' };
-  function actionIcon(a, fb){ var ic=(a&&a.icon)||fb||''; return /^svg:/.test(ic) ? (ACTION_SVG[ic.slice(4)]||esc(fb||'📍')) : esc(ic); }
+  var ACTION_IMG=['cubo-agua','maceta','neumatico','desague','flor','casa','lupa','libro','lapiz','bidon'];   // archivos ic-<nombre>.png
+  function actionIcon(a, fb){ var ic=(a&&a.icon)||fb||'', n=/^svg:/.test(ic) ? ic.slice(4) : null; return n ? (ACTION_IMG.indexOf(n)>=0 ? '<img class="ic-img" src="ic-'+n+'.png" alt="" aria-hidden="true">' : esc(fb||'📍')) : esc(ic); }
 
   // Solo fotos del Storage del proyecto (defensa extra; la base ya lo exige desde el SQL 23)
   function fotoOk(u){ u=String(u||''); return u.indexOf(SUPABASE_URL+'/storage/v1/object/')===0 && !/[\s"'<>\\]/.test(u) ? u : ''; }
@@ -2637,7 +2639,7 @@ svg.z1 .rm-name:not(.main){display:none}
 
   function actionById(id){ for(var i=0;i<S.actions.length;i++){ if(S.actions[i].id===id) return S.actions[i]; } return null; }
 
-  var LOC_LABEL = { exterior:'🌳 En exteriores', interior:'🏠 En interiores', ambos:'🔁 Interior y exterior' };
+  var LOC_LABEL = { exterior:'En exteriores', interior:'En interiores', ambos:'Interior y exterior' };
   var LOC_ORDER = ['exterior','interior','ambos'];
 
   function renderActions(){
@@ -2679,7 +2681,7 @@ svg.z1 .rm-name:not(.main){display:none}
     if(ht){
       var htc=el('button','ht-card'); htc.type='button';
       htc.innerHTML =
-        '<div class="ht-card-ic" aria-hidden="true">🏠</div>'+
+        '<div class="ht-card-ic" aria-hidden="true">'+actionIcon(ht,'🏠')+'</div>'+
         '<div class="ht-card-body"><span class="ht-card-badge">🔁 Una vez por semana</span>'+
         '<div class="ht-card-title">Recorrido por tu casa</div>'+
         '<div class="ht-card-sub">Revisá los focos lugar por lugar y sumá +'+HOUSE_TOUR_PTS_PER_STATION+' pts por cada uno.</div></div>'+
