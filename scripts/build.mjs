@@ -39,6 +39,17 @@ const OPTIONAL = [
   'caso2.jpg',
   'badge-96.png',                // ícono monocromo de las notificaciones
   'icon-neumatico.png',          // ícono de «Neumáticos y objetos grandes» (no hay emoji sin llanta)
+  // Íconos de acciones y de Aprender
+  'ic-cubo-agua.png',
+  'ic-maceta.png',
+  'ic-neumatico.png',
+  'ic-desague.png',
+  'ic-flor.png',
+  'ic-casa.png',
+  'ic-lupa.png',
+  'ic-libro.png',
+  'ic-lapiz.png',
+  'ic-bidon.png',
   // Íconos del menú inferior
   'nav-reportar.png',
   'nav-riesgo.png',
