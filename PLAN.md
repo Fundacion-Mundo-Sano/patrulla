@@ -1,6 +1,6 @@
 # Plan de acción
 
-Estado a 2026-11-07. Lo que está en orden va en orden; lo que es idea de futuro
+Estado a 2026-11-24. Lo que está en orden va en orden; lo que es idea de futuro
 va marcado como tal. El estado operativo de producción vive en [`DEPLOY.md`](DEPLOY.md).
 
 ## Estado de partida
@@ -8,13 +8,13 @@ va marcado como tal. El estado operativo de producción vive en [`DEPLOY.md`](DE
 - **Producción**: `https://patrulla-antimosquitos.com` (Apache, apex only, TLS
   Let's Encrypt). Deploy pull-based: push a `main` → tests → SSH → el servidor
   hace `git fetch` + build + release + swap + smoke, con rollback automático.
-  Timer cada 15 min como red de seguridad.
+  Repo en `github.com/Fundacion-Mundo-Sano/patrulla` (público). Sin timer activo.
 - **Staging**: `https://patrulla-staging.server.brobert.net` (CapRover, máquina
   personal). Desplegado **a mano** una vez (`caprover deploy --tarFile`), sin
   automatización. Comparte el proyecto Supabase de producción.
-- **Supabase**: proyecto `levdxusiudrtutmkyomn`, plan **Free**, propiedad de la
-  agencia que desarrolló la app. Todas las tablas con RLS; hay una auditoría con
-  fallos vivos (ver Fase 5).
+- **Supabase**: proyecto `levdxusiudrtutmkyomn`, propiedad de la fundación
+  (transferido, mismo `ref`), plan **Free**. Todas las tablas con RLS; hay una
+  auditoría con fallos vivos (ver Fase 5).
 - **App**: PWA estática, sin backend propio. `index.html` 408 KB, `admin.html`
   81 KB, `admin-reportes.html` 58 KB.
 - **Tests**: 39 tests (Bun + happy-dom + Supabase falso en memoria). Cubren
@@ -52,14 +52,11 @@ va marcado como tal. El estado operativo de producción vive en [`DEPLOY.md`](DE
 
 Va antes que nada más de Supabase, porque no toca código.
 
-- [ ] Crear organización propia de la fundación (cuenta corporativa, no personal).
-- [ ] Pasar esa organización a **Pro** (~25 $/mes): sin pausas por inactividad,
-      backups diarios, *restore to new project*, SMTP propio, más cuota.
-- [ ] Que la agencia transfiera el proyecto (*Settings → General → Transfer
-      project*). Requiere ser Owner de la org origen y miembro de la destino.
-      **La transferencia conserva el `project ref`, la URL, las claves, el auth,
-      el storage y las Edge Functions**: no hay dump, y no cambian `config.js`,
-      las CSP ni `_foto_valida`.
+- [x] Crear organización propia (cuenta corporativa, no personal) y **transferir
+      el proyecto**: hecho. El `project ref` no cambia, así que `config.js`, las
+      CSP y `_foto_valida` siguen válidos y producción no se enteró.
+- [ ] Confirmar el plan de la organización nueva: **Pro** (backups diarios,
+      *restore to new project*, sin pausas, SMTP propio) o Free.
 - [ ] Invitar a la agencia como **Developer** en el proyecto (trabajan, no
       transfieren ni cambian ajustes).
 - [ ] Rotar lo sensible: `service_role`, contraseña de la BD, SMTP, y la VAPID
@@ -75,7 +72,7 @@ Va antes que nada más de Supabase, porque no toca código.
 - [ ] Ajustar lo que cambia con un proyecto nuevo: `<meta>` CSP de las tres
       páginas, `config.js` o variables de entorno en CapRover, y `Auth → Site URL`
       + *Redirect URLs* con el dominio de staging.
-- [ ] CapRover → *Deployment → Method 3 (GitHub)*: repo `ScienseedSCS/patrulla`,
+- [ ] CapRover → *Deployment → Method 3 (GitHub)*: repo `Fundacion-Mundo-Sano/patrulla`,
       branch `main`, `Dockerfile`, auto-deploy. Staging pasa a ser un canary de
       `main`, no una rama aparte.
 - [ ] Arreglar `_foto_valida` (hardcodea el proyecto de producción) antes de
@@ -152,9 +149,10 @@ Rama: `refactor/maintainability` (ya creada desde `main`, con `docs/` dentro).
 
 ## Planes de futuro (sin fecha)
 
-- **GitHub Pages**: hoy está activo y publica una copia del repo en
-  `scienseedscs.github.io/patrulla` en cada push. Se mantiene mientras el equipo
-  lo use para previsualizar; se apaga cuando usen producción o staging.
+- **GitHub Pages**: ya no se publica ahí. Está **pendiente de apagar** (Settings →
+  Pages → Source: None, requiere admin del repo): hoy sigue sirviendo la raíz del
+  repo en `fundacion-mundo-sano.github.io/patrulla` y reconstruyendo en cada push.
+  Lo único que se publica es el servidor de producción.
 - **Play Store**: PWA empaquetada como TWA (Bubblewrap, 25 $ una vez). Web push
   sigue funcionando igual.
 - **App Store**: envoltorio nativo y cuenta de 99 $/año; Apple rechaza apps "que

@@ -16,7 +16,7 @@
 set -Eeuo pipefail
 
 APP_ROOT="${APP_ROOT:-/var/www/html/patrulla-antimosquitos.com}"
-REPO_URL="${REPO_URL:-https://github.com/ScienseedSCS/patrulla.git}"
+REPO_URL="${REPO_URL:-https://github.com/Fundacion-Mundo-Sano/patrulla.git}"
 BRANCH="${BRANCH:-main}"
 DEPLOY_USER="${DEPLOY_USER:-www-data}"
 INSTALL_TIMER="${INSTALL_TIMER:-0}"

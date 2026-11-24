@@ -1,6 +1,6 @@
 [Unit]
 Description=Deploy Patrulla Antimosquitos (git pull + build + swap)
-Documentation=https://github.com/ScienseedSCS/patrulla/blob/main/deploy/prod/deploy.sh
+Documentation=https://github.com/Fundacion-Mundo-Sano/patrulla/blob/main/deploy/prod/deploy.sh
 After=network-online.target
 Wants=network-online.target
 

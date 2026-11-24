@@ -73,8 +73,15 @@ cada push (ver `PLAN.md`, Fase 3). El detalle de build y Docker está en
 
 ## Repo y ramas
 
-- `origin` → `https://github.com/ScienseedSCS/patrulla.git`, **público**.
+- `origin` → `https://github.com/Fundacion-Mundo-Sano/patrulla.git`, **público**.
   El servidor lo clona anónimamente por HTTPS: no hay claves para leer el código.
+  Ojo: el clone del servidor debe apuntar a **esa** URL. Si apunta a la
+  organización anterior, funciona sólo por el redirect de GitHub tras una
+  transferencia, y se rompe en silencio cuando el repo viejo desaparece:
+  ```bash
+  sudo -u www-data git -C "$APP/repo" remote set-url origin \
+    https://github.com/Fundacion-Mundo-Sano/patrulla.git
+  ```
 - `main` es lo único que se despliega.
 - `deploy/caprover-staging` es trabajo de staging (CapRover) y **no** se despliega.
 
