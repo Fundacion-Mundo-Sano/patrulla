@@ -50,6 +50,12 @@ const OPTIONAL = [
   'ic-libro.png',
   'ic-lapiz.png',
   'ic-bidon.png',
+  // Ilustraciones de la bienvenida
+  'onb-agua.png',
+  'onb-lupa.png',
+  'onb-camara.png',
+  'onb-trofeo.png',
+  'onb-casa.png',
   // Íconos de los títulos de sección (sin círculo)
   'tit-reportar.png',
   'tit-riesgo.png',
